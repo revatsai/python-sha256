@@ -2,6 +2,7 @@ name: pyinstaller
 on: workflow_dispatch
 
 jobs:
+    # 同步運行3個build
     build-on-windows:
         runs-on: windows-2022
         steps:
@@ -74,7 +75,7 @@ jobs:
               run: | # chmod +x 增加可執行權限
                 ls 
                 chmod +x sha256
-                ./sha256.exe sha256
+                ./sha256 sha256
 
     test-build-mac:
         runs-on: macos-12
@@ -88,6 +89,6 @@ jobs:
               run: |
                 ls 
                 chmod +x sha256
-                ./sha256.exe sha256
+                ./sha256 sha256
 
                     
