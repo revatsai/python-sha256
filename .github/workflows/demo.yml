@@ -14,9 +14,10 @@ jobs:
             - name: upload exe file
               uses: actions/upload-artifact@v4 # 產生exe的文件
               with:
-                name: sha256-windows-exe
+                name: sha256-windows-exe # 名字須具備唯一性
                 path: dist/sha256.exe # 上傳文件的路徑
-# 都是基於x86平台
+
+    # 都是基於x86平台
     build-on-linux:
         runs-on: ubuntu-22.04
         steps:
@@ -46,3 +47,47 @@ jobs:
               with:
                 name: sha256-mac
                 path: dist/sha256
+
+    test-build-windows: # 依賴前面的jobs (build-on-windows)
+        runs-on: windows-2022
+        needs:  build-on-windows # build-on-windows執行完並且成功才會去執行test-build-windows
+        steps:
+            - name: download exe file
+              uses: actions/download-artifact@v4
+              with:
+                name: sha256-windows-exe # 名字同前給定的name, 通過網頁下載的artifect是一個壓縮的文件, 需要解壓縮, 但通過actions去下載就不用
+                # path: your/destination/dir # download放到哪個路徑下
+            - name: test exe file # 在當前位置查看有哪些文件
+              run: |
+                ls 
+                ./sha256.exe sha256.exe
+
+    test-build-linux:
+        runs-on: ubuntu-22.04
+        needs:  build-on-linux
+        steps:
+            - name: download binary file
+              uses: actions/download-artifact@v4
+              with:
+                name: sha256-linux
+            - name: test binary file
+              run: | # chmod +x 增加可執行權限
+                ls 
+                chmod +x sha256
+                ./sha256.exe sha256
+
+    test-build-mac:
+        runs-on: macos-12
+        needs:  build-on-mac
+        steps:
+            - name: download binary file
+              uses: actions/download-artifact@v4
+              with:
+                name: sha256-mac
+            - name: test binary file
+              run: |
+                ls 
+                chmod +x sha256
+                ./sha256.exe sha256
+
+                    
